@@ -17,10 +17,19 @@ public class WordCountMapper extends Mapper<Object, Text, Text, IntWritable> {
 	public void map(Object key, Text value, Context context) 
 			throws IOException, InterruptedException {
 		
-		StringTokenizer itr = new StringTokenizer(value.toString());
-		while (itr.hasMoreTokens()) {
-			word.set(itr.nextToken());
-			context.write(word, counter);
+		String[] fields = value.toString().split(",");
+		try {
+			if (fields.length == 17 && (Float.parseFloat(fields[6]) == 0 || Float.parseFloat(fields[7]) == 0 || 
+				Float.parseFloat(fields[8]) == 0 || Float.parseFloat(fields[6]) == 0 || fields[6].isEmpty()
+				|| fields[7].isEmpty() || fields[8].isEmpty() || fields[9].isEmpty())) {
+				String pickupDate = fields[2].substring(11, 13);
+				int pickupInt = Integer.parseInt(pickupDate) + 1;
+			
+				word.set(Integer.toString(pickupInt));
+				context.write(word, counter);
+			}
+		} catch (NumberFormatException e) {
+			System.out.println();
 		}
 	}
 }
