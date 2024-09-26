@@ -9,12 +9,13 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 public class WordCountReducer extends  Reducer<Text, Text, Text, FloatWritable> {
 
-   public void reduce(Text text, Iterable<Text> values, Context context)
-           throws IOException, InterruptedException {
-	   
+    public void reduce(Text text, Iterable<Text> values, Context context)
+            throws IOException, InterruptedException {
+        
         float finalAmount = 0;
         float finalTripTime = 0;
         
+        // calculate totals for the earnings amount and trip time in seconds
         for (Text value : values) {
             String[] tmp = value.toString().split(",");
             if (tmp.length == 2) { 
@@ -27,8 +28,9 @@ public class WordCountReducer extends  Reducer<Text, Text, Text, FloatWritable> 
             }
         }
 
+        // figure out final ratio (remove trip times with 0) and convert seconds to mins
         if (finalTripTime != 0) {
             context.write(text, new FloatWritable(finalAmount / (finalTripTime / 60)));
         }
-   }
+    }
 }

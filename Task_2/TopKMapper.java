@@ -14,35 +14,28 @@ import org.apache.log4j.Logger;
 
 public class TopKMapper extends Mapper<Text, Text, Text, FloatWritable> {
 
+	// setting up pq
 	private PriorityQueue<WordAndCount> pq;
 
 	public void setup(Context context) {
 		pq = new PriorityQueue<>();
-
 	}
 
-	/**
-	 * Reads in results from the first job and filters the topk results
-	 *
-	 * @param key
-	 * @param value a float value stored as a string
-	 */
+	// filters topK results
 	public void map(Text key, FloatWritable value, Context context)
 			throws IOException, InterruptedException {
-
-
+		// get the error fraction from previous reducer
         float errorFraction = value.get();
 
+		// add tuple to pq and limit it to size of 5
         pq.add(new WordAndCount(new Text(key), new FloatWritable(errorFraction)));
-
         if (pq.size() > 5) {
             pq.poll();
         }
 	}
 
+	// function to cleanup and print the top 5 results of the pq by polling
 	public void cleanup(Context context) throws IOException, InterruptedException {
-
-
 		while (pq.size() > 0) {
 			WordAndCount wordAndCount = pq.poll();
 			context.write(wordAndCount.getWord(), wordAndCount.getCount());

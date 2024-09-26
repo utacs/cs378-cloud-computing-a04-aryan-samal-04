@@ -11,10 +11,11 @@ public class WordCountReducer extends  Reducer<Text, IntWritable, Text, FloatWri
 
    public void reduce(Text text, Iterable<IntWritable> values, Context context)
            throws IOException, InterruptedException {
-	   
+        // total represents all lines and errors represents only number of lines that were errors
         int totalCount = 0;
         int errorCount = 0;
 
+        // loop to calculate both totals
         for (IntWritable value : values) {
             totalCount++;
             if (value.get() == 1) {
@@ -22,6 +23,7 @@ public class WordCountReducer extends  Reducer<Text, IntWritable, Text, FloatWri
             }
         }
 
+        // calculate and write errorFraction value to context
         float errorFraction = (float) errorCount / totalCount;
         context.write(text, new FloatWritable(errorFraction));
    }

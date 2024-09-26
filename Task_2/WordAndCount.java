@@ -7,7 +7,8 @@ import org.apache.hadoop.io.Text;
 
 
 public class WordAndCount implements Comparable<WordAndCount> {
-    // word - driverId, count - earnings/min
+
+    // get id and count - error fraction now instead of total number of errors
     private final Text word;
     private final FloatWritable count;
 
@@ -26,7 +27,7 @@ public class WordAndCount implements Comparable<WordAndCount> {
         return count;
     }
 
-    // compare to function for the earnings/min ratio
+    // compare function logic for error fractions
     @Override
     public int compareTo(WordAndCount other) {
         float diff = count.get() - other.count.get();
@@ -38,7 +39,7 @@ public class WordAndCount implements Comparable<WordAndCount> {
         return 0;
     }
 
-    // function to print strings
+    // to string for print
     public String toString(){
         return "("+word.toString() +", "+ count.toString()+")";
     }

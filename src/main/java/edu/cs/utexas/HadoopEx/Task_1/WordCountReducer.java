@@ -16,23 +16,25 @@ import java.util.Iterator;
 
 public class WordCountReducer extends  Reducer<Text, IntWritable, Text, NullWritable> {
 
+    // setting up pq based on error counts
     private PriorityQueue<WordAndCount> pq = new PriorityQueue<WordAndCount>(24);;
 
 
-   public void reduce(Text text, Iterable<IntWritable> values, Context context)
-           throws IOException, InterruptedException {
-	   
-       int sum = 0;
-       
-       for (IntWritable value : values) {
-           sum += value.get();
-       }
-       
-    //    context.write(text, new IntWritable(sum));
-        pq.add(new WordAndCount(new Text(text), new IntWritable(sum) ) );
-   }
+    public void reduce(Text text, Iterable<IntWritable> values, Context context)
+            throws IOException, InterruptedException {
+        
+        // receive total error sum
+        int sum = 0;
+        for (IntWritable value : values) {
+            sum += value.get();
+        }
+        
+        //context.write(text, new IntWritable(sum));
+        pq.add(new WordAndCount(new Text(text), new IntWritable(sum)));
+    }
 
-   public void cleanup(Context context) throws IOException, InterruptedException {
+    // function to cleanup and print the 24 hours (1-24) and report number of errors
+    public void cleanup(Context context) throws IOException, InterruptedException {
         List<WordAndCount> values = new ArrayList<WordAndCount>(24);
 
         while (pq.size() > 0) {

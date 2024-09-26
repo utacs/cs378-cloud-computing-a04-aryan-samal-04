@@ -53,6 +53,9 @@ public class WordCount extends Configured implements Tool {
 			job.setOutputKeyClass(Text.class);
 			job.setOutputValueClass(NullWritable.class);
 
+			// specified only one for number of reduce tasks
+			job.setNumReduceTasks(1);
+
 			// specify input and output directories
 			FileInputFormat.addInputPath(job, new Path(args[0]));
 			job.setInputFormatClass(TextInputFormat.class);

@@ -14,35 +14,30 @@ import org.apache.log4j.Logger;
 
 public class TopKMapper extends Mapper<Text, Text, Text, FloatWritable> {
 
+	// setting up pq
 	private PriorityQueue<WordAndCount> pq;
 
 	public void setup(Context context) {
 		pq = new PriorityQueue<>();
-
 	}
 
-	/**
-	 * Reads in results from the first job and filters the topk results
-	 *
-	 * @param key
-	 * @param value a float value stored as a string
-	 */
+	// receive results from last reducer and map topk earnings/minute
 	public void map(Text key, FloatWritable value, Context context)
 			throws IOException, InterruptedException {
+		// retrieve value
+        float moneyPerMin = value.get();
 
+		// add in to pq
+        pq.add(new WordAndCount(new Text(key), new FloatWritable(moneyPerMin)));
 
-        float errorFraction = value.get();
-
-        pq.add(new WordAndCount(new Text(key), new FloatWritable(errorFraction)));
-
+		// keep only the top 10
         if (pq.size() > 10) {
             pq.poll();
         }
 	}
 
+	// cleanup function to report the results from pq
 	public void cleanup(Context context) throws IOException, InterruptedException {
-
-
 		while (pq.size() > 0) {
 			WordAndCount wordAndCount = pq.poll();
 			context.write(wordAndCount.getWord(), wordAndCount.getCount());
